@@ -12,13 +12,15 @@ let gamePlaying = true;
 
 //fix bird hitbox
 //add score window that shows animation count
+//add gameOver screen
+//add increasing difficulty
 
 function setup(){
     createCanvas(500, 500);
     
     bird = new Bird();
     pipes.push(new Pipe());
-    scoreBoard = new ScoreBoard();
+    scoreBoard = new ScoreBoard('inGame');
 
     textFont();
     textSize(20);
@@ -54,9 +56,21 @@ function draw(){
             //scoreboard
         scoreBoard.update();
         scoreBoard.show();
+
+        //increment animationCount
+        animationCount++;
+    } 
+        //endGame
+        else {
+        background(50);
+        for (let i = pipes.length - 1; i >= 0; i--) {
+            pipes[i].show();
+        }
+        bird.update();
+        bird.show();
+        gameOverBoard();
     }
-            //increment animationCount
-    animationCount++;
+            
 }
 
         //listens for space, activates bird.up
@@ -73,7 +87,7 @@ function draw(){
         this.r = 16;
 
         this.gravity = .6 ;
-        this.lift = -25;
+        this.lift = -23;
         this.velocity = 0;
 
         this.highlight = false;
@@ -88,6 +102,7 @@ function draw(){
         }
 
         this.up = function(){
+            this.velocity = 0;
             this.velocity += this.lift;
             // console.log(this.velocity);
         }
@@ -104,12 +119,12 @@ function draw(){
             if(this.y < height - this.r && this.y > 0 + this.r ){
                 this.velocity += this.gravity;
                     //adds air resistance
-                this.velocity *= 0.9;
+                this.velocity *= 0.91;
                 this.y += this.velocity;
             }
                 //kills bird if it hits the ground
             else if(this.y > height - this.r){
-                killBird();
+                setGameOver();
             } 
                 //makes bird bounce off ceiling
             else if (this.y < 0 + this.r){
@@ -126,15 +141,12 @@ function draw(){
         this.x = width;
         this.w = 20;
         this.speed = 5;
-        this.animationCount = 0;
-
+         
         this.hits = (bird) => {
                 //y is in hit range
             if(bird.y - bird.r < this.top || bird.y + bird.r > height - this.bottom){
-                    console.log('matching y')
                     //end game if bird hits
                 if(bird.x + bird.r > this.x && bird.x + bird.r < this.x + this.w /2){
-                    console.log('matching x')
                         //highlight hit
                     bird.highlight = true;
                     setGameOver();
@@ -183,20 +195,42 @@ function draw(){
 
 setGameOver = () =>{
     gamePlaying = false;
+    // bird.velocity = -1;
 }
 
-killBird = () => {
-    bird.velocity = 0;
-}
-
-function ScoreBoard(){
+function ScoreBoard(state){
     this.w = 100;
     this.h = 80;
     this.padding = 20;
-    this.x = width - this.padding - this.w / 2;
-    this.y = 0 + this.padding + this.h / 2;
-    this.text = 0;
+    this.points = 0;
+    
+    this.setText = function(state){
+        if (state === 'inGame' || state === 'gameOver'){
+            this.text = this.points;
+        }
+        else{
+            this.text = 'new game';
+        }
+    }
+    
+        //set inGame location
+    if(state === 'inGame'){
+        this.x = width - this.padding - this.w / 2;
+        this.y = 0 + this.padding + this.h / 2;
+    }
+    else if(state === 'gameOver'){
+        this.x = width / 2;
+        this.y = height / 2;
+        this.w = 120;
+    }
+    else if(state === 'gameOverText'){
+        this.x = width / 2;
+        this.y = height / 2 + this.h + this.padding;
+        this.w = 120;
+    }
+
     this.show = function(){
+        this.setText(state);
         fill('rgba(0, 0, 0, .7)');
         rectMode(CENTER); //sets rect mode to be center based
         rect(this.x, this.y, this.w, this.h);
@@ -205,9 +239,39 @@ function ScoreBoard(){
             //tick score up by one for each 5 animations
         text(`${this.text}`, this.x, this.y)
     }
+        //tick up points
     this.update = function (){
-        this.text = Math.floor(animationCount / 25);
+        this.points = Math.floor(animationCount / 25);
+            //sets text
+        this.setText(state);
     }
 }
+
+function gameOverBoard(){
+        //darken bg
+    gameOverBG();
+    
+        //draw final scoreboard
+    let score = new ScoreBoard('gameOver');
+    score.update();
+    score.show();
+
+        //final score text
+    text('final score:', score.x, score.y + score.h + score.padding);
+    newGameBtn();
+
+
+}
+
+function gameOverBG(){
+    fill('rgba(0, 0, 0, .5)');
+    rect(0, 0, width, height);
+}
+
+function newGameBtn(){
+    let btn = new ScoreBoard('gameOverText');
+    btn.show();
+}
+
 
 //how to import/export?
