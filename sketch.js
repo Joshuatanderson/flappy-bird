@@ -10,6 +10,9 @@ let gamePlaying = true;
     //if bird hits a pipe, gamePlaying = false
     //wrap whole draw function contents in an if statement for gamePlaying
 
+//fix bird hitbox
+//add score window that shows animation count
+
 function setup(){
     createCanvas(500, 500);
     
@@ -27,6 +30,7 @@ function draw(){
         }
             //update onscreen && remove offscreen
         for(let i = pipes.length - 1; i >= 0; i--){
+                //run hit function
             if(pipes[i].hits(bird)){
                 console.log('HIT');
             }
@@ -40,7 +44,7 @@ function draw(){
         }
             //bird
         bird.update();
-        bird.show();
+        bird.show(); 
     }
             //increment animationCount
     animationCount++;
@@ -117,18 +121,31 @@ function draw(){
 
         this.hits = (bird) => {
                 //y is in hit range
-            if(bird.y < this.top || bird.y > height - this.bottom){
-                    //bird x hits the x coordinate of a pipe
-                if(bird.x > this.x && bird.x < this.x +this.w){
+            if(bird.y - bird.r < this.top || bird.y + bird.r > height - this.bottom){
+                    console.log('matching y')
+                    //end game if bird hits
+                if(bird.x + bird.r > this.x && bird.x + bird.r < this.x + this.w /2){
+                    console.log('matching x')
                         //highlight hit
                     bird.highlight = true;
                     setGameOver();
-                    console.log(`gamePlaying: ${gamePlaying}`);
-                    return true
+
+                    let hitCoordinates = {
+                        birdX: bird.x,
+                        birdY: bird.y,
+                        pBottom: this.bottom,
+                        pTop: this.top,
+                    }
+                    console.log(hitCoordinates);
+                    return true;
                 }
                 bird.highlight = false;
+                    //didn't hit
+                return false;
             }
             bird.highlight = false;
+                //didn't hit
+            return false;
         }
 
         this.update = () => {
@@ -139,7 +156,7 @@ function draw(){
             fill(255);
                 //bottom rectangle (starts at top of screen, ends at this.bottom )
             rect(this.x, 0, this.w, this.top);
-            fill('red');
+            fill('red'); 
                 //draws rect that starts at bottom of screen, ends at the length of this.bottom
             rect(this.x, height - this.bottom, this.w, this.bottom);
         }
