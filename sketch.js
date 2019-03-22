@@ -17,7 +17,12 @@ function setup(){
     createCanvas(500, 500);
     
     bird = new Bird();
-    pipes.push(new Pipe())
+    pipes.push(new Pipe());
+    scoreBoard = new ScoreBoard();
+
+    textFont();
+    textSize(20);
+    textAlign(CENTER, CENTER);
 }
 
 function draw(){
@@ -45,6 +50,10 @@ function draw(){
             //bird
         bird.update();
         bird.show(); 
+
+            //scoreboard
+        scoreBoard.update();
+        scoreBoard.show();
     }
             //increment animationCount
     animationCount++;
@@ -60,8 +69,8 @@ function draw(){
 
     function Bird() {
         this.y = height / 2;
-        this.x = 50;
-        this.r = 16
+        this.x = 75;
+        this.r = 16;
 
         this.gravity = .6 ;
         this.lift = -25;
@@ -180,5 +189,25 @@ killBird = () => {
     bird.velocity = 0;
 }
 
+function ScoreBoard(){
+    this.w = 100;
+    this.h = 80;
+    this.padding = 20;
+    this.x = width - this.padding - this.w / 2;
+    this.y = 0 + this.padding + this.h / 2;
+    this.text = 0;
+    this.show = function(){
+        fill('rgba(0, 0, 0, .7)');
+        rectMode(CENTER); //sets rect mode to be center based
+        rect(this.x, this.y, this.w, this.h);
+        rectMode(CORNER); //resets rectMode
+        fill(255);
+            //tick score up by one for each 5 animations
+        text(`${this.text}`, this.x, this.y)
+    }
+    this.update = function (){
+        this.text = Math.floor(animationCount / 25);
+    }
+}
 
 //how to import/export?
