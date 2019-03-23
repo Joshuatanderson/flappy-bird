@@ -32,7 +32,7 @@ function draw(){
         background(50);
 
             //add new pipes
-        if(animationCount % 70 === 0){
+        if(animationCount % 70 === 0 && animationCount !== 0){
             pipes.push(new Pipe());
         }
             //update onscreen && remove offscreen
@@ -136,17 +136,21 @@ function draw(){
     }
 
     function Pipe(){
-        this.bottom = random(height / 2);
+        this.space = 150;
         this.top = random(height / 2);
+        console.log(this.top);
+            //sets this.bottom
+        this.bottom = this.top + this.space;
+        console.log(this.bottom);
         this.x = width;
         this.w = 20;
         this.speed = 5;
          
         this.hits = (bird) => {
                 //y is in hit range
-            if(bird.y - bird.r < this.top || bird.y + bird.r > height - this.bottom){
+            if(bird.y + bird.r < this.top || bird.y + bird.r > this.bottom){
                     //end game if bird hits
-                if(bird.x + bird.r > this.x && bird.x + bird.r < this.x + this.w /2){
+                if(bird.x + bird.r > this.x && bird.x + bird.r < this.x + this.w){
                         //highlight hit
                     bird.highlight = true;
                     setGameOver();
@@ -175,11 +179,11 @@ function draw(){
 
         this.show = function(){
             fill(255);
-                //bottom rectangle (starts at top of screen, ends at this.bottom )
+                //top rectangle (starts at top of screen, ends at this.bottom )
             rect(this.x, 0, this.w, this.top);
-            fill('red'); 
-                //draws rect that starts at bottom of screen, ends at the length of this.bottom
-            rect(this.x, height - this.bottom, this.w, this.bottom);
+            fill(255); 
+                //draws bottom rectangloe
+            rect(this.x, this.bottom, this.w, height - this.bottom);
         }
             //removes offscreen pipe
         this.offScreen = () => {
@@ -260,7 +264,6 @@ function gameOverBoard(){
     text('final score:', score.x, score.y + score.h + score.padding);
     newGameBtn();
 
-
 }
 
 function gameOverBG(){
@@ -271,7 +274,25 @@ function gameOverBG(){
 function newGameBtn(){
     let btn = new ScoreBoard('gameOverText');
     btn.show();
+    //reset game
+    mouseClicked = () => {
+        if(gamePlaying === false){
+            resetGame()
+        }
+    }
 }
 
+    //returns random integer between min and max
+function getRandomIntInRange(min, max){
+    return Math.floor(Math.random() * (max-min) + min);
+}
 
 //how to import/export?
+
+//reset game
+function resetGame(){
+    pipes = [];
+    animationCount = 0;
+    gamePlaying = true;
+    setup();
+}
