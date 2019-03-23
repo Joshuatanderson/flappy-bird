@@ -178,10 +178,10 @@ function draw(){
         }
 
         this.show = function(){
-            fill(255);
+            fill(200);
                 //top rectangle (starts at top of screen, ends at this.bottom )
             rect(this.x, 0, this.w, this.top);
-            fill(255); 
+            fill(200); 
                 //draws bottom rectangloe
             rect(this.x, this.bottom, this.w, height - this.bottom);
         }
